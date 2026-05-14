@@ -1,0 +1,22 @@
+ncsim: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+
+-------------------------------------
+Relinquished control to SimVision...
+ncsim> 
+ncsim> database -open waves -into waves.shm -default
+Created default SHM database waves
+ncsim> probe -create -shm tb_spi_baud_rate_generator.cpha tb_spi_baud_rate_generator.cpol tb_spi_baud_rate_generator.miso_receive_s_clk_falling tb_spi_baud_rate_generator.miso_receive_s_clk_rising tb_spi_baud_rate_generator.mosi_send_s_clk_falling tb_spi_baud_rate_generator.mosi_send_s_clk_rising tb_spi_baud_rate_generator.p_clk tb_spi_baud_rate_generator.p_reset tb_spi_baud_rate_generator.s_clk tb_spi_baud_rate_generator.spi_baud_rate_divisor tb_spi_baud_rate_generator.spi_mode tb_spi_baud_rate_generator.spiswai tb_spi_baud_rate_generator.sppr tb_spi_baud_rate_generator.spr tb_spi_baud_rate_generator.ss
+Created probe 1
+ncsim> run
+ input TIME=0 p_reset=1 spiswai=0 cpol=0 cpha=0 ss=1 spi_mode=00 sppr=000 spr=001
+ output TIME=0 | s_clk=x | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=x
+PASS : SPPR=0 SPR=1 DIV=4
+PASS : SPPR=3 SPR=7 DIV=1024
+PASS : SPPR=5 SPR=3 DIV=96
+FAIL : SPPR=6 SPR=3 EXPECTED=56 GOT=112
+PASS : SPPR=7 SPR=7 DIV=2048
+Simulation interrupted at 448444400 NS + 0
+ncsim> ^C
+ncsim> exit
+ncsim: Memory Usage - 20.7M program + 31.9M data = 52.6M total
+ncsim: CPU Usage - 3.5s system + 13.2s user = 16.7s total (109.6s, 15.2% cpu)

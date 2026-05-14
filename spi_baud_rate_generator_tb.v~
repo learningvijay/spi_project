@@ -1,0 +1,141 @@
+`timescale 1ns/1ps
+
+module tb_spi_baud_rate_generator;
+
+//
+// INPUTS
+//
+reg p_clk;
+reg p_reset;
+reg spiswai;
+reg cpol;
+reg cpha;
+reg ss;
+
+reg [1:0] spi_mode;
+reg [2:0] sppr;
+reg [2:0] spr;
+
+//
+// OUTPUTS
+//
+wire s_clk;
+
+wire miso_receive_s_clk_rising;
+wire miso_receive_s_clk_falling;
+
+wire mosi_send_s_clk_rising;
+wire mosi_send_s_clk_falling;
+
+wire [11:0] spi_baud_rate_divisor;
+
+
+//
+// DUT INSTANTIATION
+//
+spi_baud_rate_generator DUT (
+    .p_clk(p_clk),
+    .p_reset(p_reset),
+    .spiswai(spiswai),
+    .cpol(cpol),
+    .cpha(cpha),
+    .ss(ss),
+
+    .spi_mode(spi_mode),
+    .sppr(sppr),
+    .spr(spr),
+
+    .s_clk(s_clk),
+
+    .miso_receive_s_clk_rising(miso_receive_s_clk_rising),
+    .miso_receive_s_clk_falling(miso_receive_s_clk_falling),
+
+    .mosi_send_s_clk_rising(mosi_send_s_clk_rising),
+    .mosi_send_s_clk_falling(mosi_send_s_clk_falling),
+
+    .spi_baud_rate_divisor(spi_baud_rate_divisor)
+);
+
+
+initial begin
+    p_clk = 1'b0;
+    forever #20 p_clk = ~p_clk;
+end
+
+task initialize;begin
+    p_clk    = 1'b0;
+    p_reset  = 1'b1;
+    spiswai  = 1'b0;
+    cpol     = 1'b0;
+    cpha     = 1'b0;
+    ss       = 1'b1;
+    spi_mode = 2'b00;
+    sppr     = 3'b000;
+    spr      = 3'b001;
+    display;
+end
+endtask
+
+
+task display;
+begin
+    $display(" input TIME=%0t p_reset=%b spiswai=%b cpol=%b cpha=%b ss=%b spi_mode=%b sppr=%b spr=%b",
+              $time,
+              p_reset,
+              spiswai,
+              cpol,
+              cpha,
+              ss,
+              spi_mode,
+              sppr,
+              spr);
+    $display(" output TIME=%0t | s_clk=%b | RX_R=%b | RX_F=%b | TX_R=%b | TX_F=%b | DIV=%0d",
+    $time,
+    s_clk,
+    miso_receive_s_clk_rising,
+    miso_receive_s_clk_falling,
+    mosi_send_s_clk_rising,
+    mosi_send_s_clk_falling,
+    spi_baud_rate_divisor
+    );
+end
+endtask
+
+task check_divisor;
+
+input [2:0] t_sppr;
+input [2:0] t_spr;
+input [11:0] expected_divisor;
+
+begin
+
+    sppr = t_sppr;
+    spr  = t_spr;
+
+    #10;
+
+    if (spi_baud_rate_divisor == expected_divisor)
+        $display("PASS : SPPR=%0d SPR=%0d DIV=%0d",
+                  t_sppr, t_spr, spi_baud_rate_divisor);
+
+    else
+        $display("FAIL : SPPR=%0d SPR=%0d EXPECTED=%0d GOT=%0d",
+                  t_sppr, t_spr,
+                  expected_divisor,
+                  spi_baud_rate_divisor);
+
+end
+endtask
+
+initial begin
+
+    initialize;
+    
+    check_divisor(3'b000,3'b001,4);
+    check_divisor(3'b011,3'b111,1024);
+    check_divisor(3'b101,3'b011,96);
+    check_divisor(3'b110,3'b010,56);
+    check_divisor(3'b111,3'b111,2048);
+end
+
+endmodule
