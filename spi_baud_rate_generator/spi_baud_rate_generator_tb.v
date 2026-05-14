@@ -128,6 +128,17 @@ begin
 end
 endtask
 
+task setup_and_check(input a,b,c,d,e );
+begin 
+p_reset=a;
+ss=b;
+spiswai=c;
+cpol=d;
+cpha=e;
+display;
+end
+endtask
+
 initial begin
 
     initialize;
@@ -137,6 +148,32 @@ initial begin
     check_divisor(3'b101,3'b011,96);
     check_divisor(3'b110,3'b010,56);
     check_divisor(3'b111,3'b111,2048);
+    check_divisor(3'b000,3'b001,4);
+    setup_and_check(1'b0,1'b0,1'b0,1'b0,1'b1);
+    setup_and_check(1'b1,1'b1,1'b0,1'b0,1'b1);
+    setup_and_check(1'b0,1'b0,1'b1,1'b0,1'b1);
+    #1000;
+    p_reset=1'b1;
+    #5000;
+    setup_and_check(1'b0,1'b0,1'b0,1'b1,1'b1);
+        #1000;
+    p_reset=1'b1;
+    #5000;
+     setup_and_check(1'b0,1'b0,1'b0,1'b0,1'b1);
+         #1000;
+     p_reset=1'b1;
+    #5000;
+      setup_and_check(1'b0,1'b0,1'b0,1'b1,1'b1);
+        #1000;
+     p_reset=1'b1;
+    #5000;
+   
+    
+    
+    
+  #100$finish;
 end
+
+
 
 endmodule

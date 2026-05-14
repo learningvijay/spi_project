@@ -1,0 +1,103 @@
+`timescale 1ns/1ps
+module spi_baud_rate_generator(
+    input p_clk, p_reset, spiswai, cpol, cpha, ss,
+    input [1:0]spi_mode,
+    input [2:0]sppr,
+    input [2:0]spr,
+    output reg s_clk,
+    output reg miso_receive_s_clk_rising,
+    output reg miso_receive_s_clk_falling,
+    output reg mosi_send_s_clk_rising,
+    output reg mosi_send_s_clk_falling,
+    output wire [11:0]spi_baud_rate_divisor
+);
+
+wire pre_s_clk;
+reg [11:0]count;
+
+// BAUDRATE DIVISOR
+assign spi_baud_rate_divisor = (sppr+1)*(2**(spr+1));
+
+//s_clk state at idle mode 
+assign pre_s_clk=cpol?1'b1:1'b0;
+
+//s_clk generation
+always@(posedge p_clk or negedge p_reset) begin
+    if(!p_reset)begin
+        s_clk<=pre_s_clk;
+        count<=12'b0;
+    end
+    else if((((spi_mode==2'b00)||(spi_mode==2'b01))&&(~ss)&&(~spiswai)))begin
+        if(count==((spi_baud_rate_divisor-1)/2))begin
+            s_clk<=~s_clk;
+            count<=12'b0;
+        end
+        else begin
+            count<=count+1'b1;
+        end
+    end
+    else begin
+        s_clk<=pre_s_clk;
+        count<=12'b0;
+    end
+
+
+end
+
+// miso_receive_s_clk_rising both cpol and cphs is set to either to 1 or 0;
+//miso_receive_s_clk_falling both cpol and cphas is either 0 or 1;
+always @(posedge p_clk or negedge p_reset) begin
+    if (!p_reset) begin
+        miso_receive_s_clk_rising  <= 1'b0;
+        miso_receive_s_clk_falling <= 1'b0;
+    end
+    else begin
+
+        // default
+        miso_receive_s_clk_rising  <= 1'b0;
+        miso_receive_s_clk_falling <= 1'b0;
+
+        if (count == (spi_baud_rate_divisor-1)/2) begin
+
+            if (cpha ~^ cpol) begin
+                if (s_clk == 1'b0)
+                    miso_receive_s_clk_rising <= 1'b1;
+            end
+            else begin
+                if (s_clk == 1'b1)
+                    miso_receive_s_clk_falling <= 1'b1;
+            end
+
+        end
+    end
+end
+
+//mosi_send_s_clk_rising both cpol and cphs is set to either to 1 or 0;
+//mosi_send_s_clk_falling both cpol and cphas is either 0 or 1;
+always @(posedge p_clk or negedge p_reset) begin
+    if (!p_reset) begin
+        mosi_send_s_clk_rising  <= 1'b0;
+        mosi_send_s_clk_falling <= 1'b0;
+    end
+    else begin
+
+        // default
+        mosi_send_s_clk_rising  <= 1'b0;
+        mosi_send_s_clk_falling <= 1'b0;
+
+        if (count == (spi_baud_rate_divisor-1)/2) begin
+
+            if (cpha ^ cpol) begin
+                if (s_clk == 1'b0)
+                    mosi_send_s_clk_rising <= 1'b1;
+            end
+            else begin
+                if (s_clk == 1'b1)
+                    mosi_send_s_clk_falling <= 1'b1;
+            end
+
+        end
+    end
+end
+
+endmodule

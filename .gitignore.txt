@@ -1,0 +1,18 @@
+# Cadence / Xcelium generated files
+INCA_libs/
+waves.shm/
+*.log
+*.key
+*.history
+
+# Simulation dump files
+*.vcd
+*.fsdb
+
+# Temporary files
+*.tmp
+*.bak
+
+# OS files
+Thumbs.db
+.DS_Store

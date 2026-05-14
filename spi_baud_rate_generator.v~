@@ -27,7 +27,7 @@ always@(posedge p_clk or negedge p_reset) begin
         s_clk<=pre_s_clk;
         count<=12'b0;
     end
-    else if((((spi_mode==2'b00)||(spi_mode==2'b01))&&(~ss)&&(spiswai)))begin
+    else if((((spi_mode==2'b00)||(spi_mode==2'b01))&&(~ss)&&(~spiswai)))begin
         if(count==((spi_baud_rate_divisor-1)/2))begin
             s_clk<=~s_clk;
             count<=12'b0;
@@ -59,7 +59,7 @@ always @(posedge p_clk or negedge p_reset) begin
 
         if (count == (spi_baud_rate_divisor-1)/2) begin
 
-            if (cpha ^ cpol) begin
+            if (cpha ~^ cpol) begin
                 if (s_clk == 1'b0)
                     miso_receive_s_clk_rising <= 1'b1;
             end
@@ -87,7 +87,7 @@ always @(posedge p_clk or negedge p_reset) begin
 
         if (count == (spi_baud_rate_divisor-1)/2) begin
 
-            if (cpha ~^ cpol) begin
+            if (cpha ^ cpol) begin
                 if (s_clk == 1'b0)
                     mosi_send_s_clk_rising <= 1'b1;
             end
