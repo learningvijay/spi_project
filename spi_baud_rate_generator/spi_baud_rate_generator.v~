@@ -9,14 +9,14 @@ module spi_baud_rate_generator(
     output reg miso_receive_s_clk_falling,
     output reg mosi_send_s_clk_rising,
     output reg mosi_send_s_clk_falling,
-    output wire [12:0]spi_baud_rate_divisor
+    output wire [11:0]spi_baud_rate_divisor
 );
 
 wire pre_s_clk;
-reg [12:0]count;
+reg [11:0]count;
 
 // BAUDRATE DIVISOR
-assign spi_baud_rate_divisor = ((sppr+1)*(2**(spr+1)));
+assign spi_baud_rate_divisor = ((sppr+3'b001)*(2**(spr+3'b001)));
 
 //s_clk state at idle mode 
 assign pre_s_clk=cpol;

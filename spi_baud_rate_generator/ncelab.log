@@ -1,0 +1,6 @@
+ncelab: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+    .spi_baud_rate_divisor(spi_baud_rate_divisor)
+                                               |
+ncelab: *W,CUVMPW (./spi_baud_rate_generator_tb.v,56|47): port sizes differ in port connection (12/13).
+ncelab: Memory Usage - 26.2M program + 14.0M data = 40.2M total
+ncelab: CPU Usage - 0.1s system + 0.1s user = 0.2s total (0.2s, 100.0% cpu)

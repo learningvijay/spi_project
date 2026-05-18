@@ -1,7 +1,7 @@
 # DO NOT EDIT -- automatically generated design data file -- DO NOT EDIT!!!
 list \
 workdir {/mnt/hgfs/apb_interface_spi_master_project} \
-cdslib {/mnt/hgfs/apb_interface_spi_master_project/cds.lib} \
+cdslib {} \
 worklib {worklib} \
 mode {0} \
 filters {*.v *.vhd *.vhdl} \

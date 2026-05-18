@@ -1,0 +1,22 @@
+ncsim: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+
+-------------------------------------
+Relinquished control to SimVision...
+ncsim> 
+ncsim> database -open waves -into waves.shm -default
+Created default SHM database waves
+ncsim> probe -create -shm tb_spi_shift_reg.ai tb_spi_shift_reg.count0 tb_spi_shift_reg.count1 tb_spi_shift_reg.count2 tb_spi_shift_reg.count3 tb_spi_shift_reg.cpha tb_spi_shift_reg.cpol tb_spi_shift_reg.data_from_spidr tb_spi_shift_reg.data_to_spidr tb_spi_shift_reg.i tb_spi_shift_reg.j tb_spi_shift_reg.lsbef tb_spi_shift_reg.miso tb_spi_shift_reg.miso_receive_s_clk_falling tb_spi_shift_reg.miso_receive_s_clk_rising tb_spi_shift_reg.mosi tb_spi_shift_reg.mosi_send_s_clk_falling tb_spi_shift_reg.mosi_send_s_clk_rising tb_spi_shift_reg.p_clk tb_spi_shift_reg.p_reset tb_spi_shift_reg.receive_buffer_reg tb_spi_shift_reg.receive_data tb_spi_shift_reg.send_buffer_reg tb_spi_shift_reg.send_data tb_spi_shift_reg.ss tb_spi_shift_reg.vitual_slave_send_buffer
+Created probe 1
+ncsim> run
+vitual_slave_send_buffer = 0d
+FORMAT=4 EXPECTED=0d RECEIVED=0d
+vitual_slave_send_buffer = 8d
+FORMAT=4 EXPECTED=8d RECEIVED=8d
+vitual_slave_send_buffer = 65
+FORMAT=4 EXPECTED=65 RECEIVED=65
+vitual_slave_send_buffer = 12
+FORMAT=4 EXPECTED=12 RECEIVED=12
+Simulation complete via $finish(1) at time 21770 NS + 0
+./spi_shift_reg_tb.v:372   #10  $finish;
+ncsim> ncsim: Memory Usage - 20.7M program + 35.8M data = 56.5M total
+ncsim: CPU Usage - 2.4s system + 11.7s user = 14.1s total (219.8s, 6.4% cpu)

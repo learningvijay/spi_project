@@ -121,7 +121,7 @@ endtask
 
 integer i;
 integer ai,j;
-reg [7:0] vitual_slave_send_buffer;
+reg [7:0] rx_data;
 
 initial begin
 initialize;
@@ -268,9 +268,9 @@ shift_s_en;
         // RANDOM RECEIVE DATA
         //-----------------------------------------
 
-        vitual_slave_send_buffer = $random & 8'hFF;
+        rx_data = $random & 8'hFF;
 
-        $display("vitual_slave_send_buffer = %h", vitual_slave_send_buffer);
+        $display("RX_DATA = %h", rx_data);
 
 
         //-----------------------------------------
@@ -285,14 +285,14 @@ shift_s_en;
             //-----------------------------------------
 
             if(lsbef == 1'b0)
-                miso = vitual_slave_send_buffer[7-j];
+                miso = rx_data[7-j];
 
             //-----------------------------------------
             // LSB FIRST
             //-----------------------------------------
 
             else
-                miso = vitual_slave_send_buffer[j];
+                miso = rx_data[j];
 
 
             //-----------------------------------------
@@ -305,15 +305,11 @@ shift_s_en;
                 @(posedge p_clk);
                 miso_receive_s_clk_rising = 1'b1;
 
-              
+                @(posedge p_clk);
+                 @(posedge p_clk);
+                  @(posedge p_clk);
                    @(posedge p_clk);
                 miso_receive_s_clk_rising = 1'b0;
-                  @(posedge p_clk);
-                 @(posedge p_clk);
-                  @(posedge p_clk);
-                    @(posedge p_clk);
-                 @(posedge p_clk);
-                  @(posedge p_clk);
 
             end
 
@@ -361,7 +357,7 @@ shift_s_en;
         $display(
             "FORMAT=%0d EXPECTED=%h RECEIVED=%h",
             i,
-            vitual_slave_send_buffer,
+            rx_data,
             data_to_spidr
         );
 

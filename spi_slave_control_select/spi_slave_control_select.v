@@ -1,0 +1,60 @@
+module spi_slave_control_select (
+    input p_clk,p_reset,mstr,spiswai,send_data,
+    input [12:0]baudrate_divisor,
+    input [1:0]spi_mode,
+    output recive_data,ss,tip
+);
+ reg [15:0]count;
+ reg [15:0]required_count_to_send;
+ reg rvc;
+
+  assign required_count_to_send = baudrate_divisor*5'd8;
+  assign tip = ~ss:
+
+ always@(posedge p_clk or negedge p_reset) begin
+    if (!p_reset) begin
+        count<=16'hffff;
+        ss<=1'b1;
+        rvc<=1'b0;        
+    end
+    else if (mstr && ((spi_mode==2'b00) ||((spi_mode==2'b01)&& (!spiswai)) ) ) begin
+        if (send_data) begin
+            ss<=1'b0;
+            count<=16'b0;
+        end
+        else if(count<=required_count_to_send)begin
+            ss<=1'b0;
+            count<=count+1'b1;
+            if(count==required_count_to_send)begin
+                rvc<=1'b1;
+            end
+            else begin
+                rvc<=1'b0;
+            end
+        else begin
+            count<=16'hffff;
+            ss<=1'b1;
+            rvc<=1'b0; 
+         end
+        end
+         else begin
+            count<=16'hffff;
+            ss<=1'b1;
+            rvc<=1'b0; 
+         end
+    end
+end
+
+always@(posedge p_clk or negedge p_reset) begin
+    if(!p_reset)begin
+        recive_data<=1'b0;
+    end
+    else begin
+        recive_data<=rvc;
+    end
+    
+end
+
+    
+endmodule
+
