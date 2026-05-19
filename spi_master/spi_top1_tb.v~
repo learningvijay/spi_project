@@ -1,0 +1,299 @@
+`timescale 1ns/1ps
+
+module spi_top_tb;
+
+  //=========================================================
+  // APB SIGNALS
+  //=========================================================
+
+  reg         p_clk;
+  reg         p_reset;
+
+  reg         p_select;
+  reg         p_enable;
+  reg         p_write;
+
+  reg  [2:0] p_addr;
+  reg  [7:0] p_data_in;
+
+  wire [7:0] p_data_out;
+  wire       p_ready;
+  wire       p_slverr;
+
+  //=========================================================
+  // SPI SIGNALS
+  //=========================================================
+
+  wire ss;
+  wire s_clk;
+  wire mosi;
+
+  reg  miso;
+
+  wire spi_interrupt_request;
+
+  //=========================================================
+  // DUT
+  //=========================================================
+
+  spi_top DUT (
+
+      .p_clk(p_clk),
+      .p_reset(p_reset),
+
+      .p_select(p_select),
+      .p_enable(p_enable),
+      .p_write(p_write),
+
+      .p_addr(p_addr),
+      .p_data_in(p_data_in),
+
+      .p_data_out(p_data_out),
+      .p_ready(p_ready),
+      .p_slverr(p_slverr),
+
+      .ss(ss),
+      .s_clk(s_clk),
+      .mosi(mosi),
+
+      .miso(miso),
+
+      .spi_interrupt_request(spi_interrupt_request)
+
+  );
+
+  //=========================================================
+  // CLOCK GENERATION
+  //=========================================================
+
+  parameter T = 10;
+
+  initial
+  begin
+      p_clk = 0;
+
+      forever
+          #(T/2) p_clk = ~p_clk;
+  end
+
+  //=========================================================
+  // RESET TASK
+  //=========================================================
+
+  task reset_dut;
+  begin
+
+      p_reset  = 1'b1;
+
+      p_select = 0;
+      p_enable = 0;
+      p_write  = 0;
+
+      p_addr   = 0;
+      p_data_in = 0;
+
+      miso = 0;
+
+      repeat(5)
+          @(posedge p_clk);
+
+      p_reset = 1'b0;
+
+      $display("RESET COMPLETED AT TIME = %0t", $time);
+
+  end
+  endtask
+
+  //=========================================================
+  // APB WRITE TASK
+  //=========================================================
+
+  task apb_write;
+
+      input [2:0] addr;
+      input [7:0] data;
+
+  begin
+
+      @(posedge p_clk);
+
+      p_select  <= 1'b1;
+      p_enable  <= 1'b0;
+      p_write   <= 1'b1;
+
+      p_addr    <= addr;
+      p_data_in <= data;
+
+      @(posedge p_clk);
+
+      p_enable <= 1'b1;
+
+      wait(p_ready == 1'b1);
+
+      @(posedge p_clk);
+
+      p_select <= 0;
+      p_enable <= 0;
+      p_write  <= 0;
+
+      $display("APB WRITE : ADDR = %0h DATA = %0h TIME = %0t",
+                 addr, data, $time);
+
+  end
+  endtask
+
+  //=========================================================
+  // APB READ TASK
+  //=========================================================
+
+  task apb_read;
+
+      input  [2:0] addr;
+
+  begin
+
+      @(posedge p_clk);
+
+      p_select <= 1'b1;
+      p_enable <= 1'b0;
+      p_write  <= 1'b0;
+
+      p_addr <= addr;
+
+      @(posedge p_clk);
+
+      p_enable <= 1'b1;
+
+      wait(p_ready == 1'b1);
+
+      @(posedge p_clk);
+
+      $display("APB READ  : ADDR = %0h DATA = %0h TIME = %0t",
+                 addr, p_data_out, $time);
+
+      p_select <= 0;
+      p_enable <= 0;
+
+  end
+  endtask
+
+  //=========================================================
+  // SEND SERIAL DATA ON MISO
+  //=========================================================
+
+  task spi_slave_send;
+
+      input [7:0] data;
+
+      integer i;
+
+  begin
+
+      for(i=7; i>=0; i=i-1)
+      begin
+
+          @(negedge s_clk);
+
+          miso = data[i];
+
+          $display("MISO SENT BIT = %0b TIME = %0t",
+                    data[i], $time);
+
+      end
+
+  end
+  endtask
+
+  //=========================================================
+  // MONITOR
+  //=========================================================
+
+  initial
+  begin
+
+      $monitor("TIME=%0t SS=%0b SCLK=%0b MOSI=%0b MISO=%0b IRQ=%0b",
+                $time,
+                ss,
+                s_clk,
+                mosi,
+                miso,
+                spi_interrupt_request);
+
+  end
+
+  //=========================================================
+  // TESTCASE
+  //=========================================================
+
+  initial
+  begin
+
+      //-----------------------------------------------------
+      // RESET
+      //-----------------------------------------------------
+
+      reset_dut;
+
+      //-----------------------------------------------------
+      // CONFIGURATION REGISTER WRITE
+      //-----------------------------------------------------
+      // MODIFY THESE ADDRESSES
+      // ACCORDING TO YOUR REGISTER MAP
+      //-----------------------------------------------------
+
+      // CONTROL REGISTER
+
+      apb_write(3'b000, 8'b01010000);
+
+      // BAUD REGISTER
+
+      apb_write(3'b001, 8'h04);
+
+      // TX DATA REGISTER
+
+      apb_write(3'b010, 8'hA5);
+
+      //-----------------------------------------------------
+      // START SPI TRANSFER
+      //-----------------------------------------------------
+
+      apb_write(3'b000, 8'b11010000);
+
+      //-----------------------------------------------------
+      // SLAVE RETURNS DATA
+      //-----------------------------------------------------
+
+      spi_slave_send(8'h3C);
+
+      //-----------------------------------------------------
+      // WAIT
+      //-----------------------------------------------------
+
+      #500;
+
+      //-----------------------------------------------------
+      // READ RX REGISTER
+      //-----------------------------------------------------
+
+      apb_read(3'b011);
+
+      //-----------------------------------------------------
+      // INTERRUPT CHECK
+      //-----------------------------------------------------
+
+      if(spi_interrupt_request)
+          $display("SPI INTERRUPT GENERATED SUCCESSFULLY");
+      else
+          $display("SPI INTERRUPT NOT GENERATED");
+
+      //-----------------------------------------------------
+      // FINISH
+      //-----------------------------------------------------
+
+      #100;
+
+      $finish;
+
+  end
+
+endmodule

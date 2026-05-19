@@ -1,0 +1,24 @@
+ncsim: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+
+-------------------------------------
+Relinquished control to SimVision...
+ncsim> 
+ncsim> database -open waves -into waves.shm -default
+Created default SHM database waves
+ncsim> probe -create -shm spb_master_apb_slave_interface_tb.cpha spb_master_apb_slave_interface_tb.cpol spb_master_apb_slave_interface_tb.data_from_receive_buffer_reg spb_master_apb_slave_interface_tb.data_to_send_buffer_reg spb_master_apb_slave_interface_tb.lsbfe spb_master_apb_slave_interface_tb.mstr spb_master_apb_slave_interface_tb.p_addr spb_master_apb_slave_interface_tb.p_clk spb_master_apb_slave_interface_tb.p_data_in spb_master_apb_slave_interface_tb.p_data_out spb_master_apb_slave_interface_tb.p_enable spb_master_apb_slave_interface_tb.p_ready spb_master_apb_slave_interface_tb.p_reset spb_master_apb_slave_interface_tb.p_select spb_master_apb_slave_interface_tb.p_slverr spb_master_apb_slave_interface_tb.p_write spb_master_apb_slave_interface_tb.receive_data spb_master_apb_slave_interface_tb.send_data spb_master_apb_slave_interface_tb.spi_interrupt_request spb_master_apb_slave_interface_tb.spi_mode spb_master_apb_slave_interface_tb.spibr spb_master_apb_slave_interface_tb.spicr1 spb_master_apb_slave_interface_tb.spicr2 spb_master_apb_slave_interface_tb.spidr spb_master_apb_slave_interface_tb.spisr spb_master_apb_slave_interface_tb.spiswai spb_master_apb_slave_interface_tb.sppr spb_master_apb_slave_interface_tb.spr spb_master_apb_slave_interface_tb.ss spb_master_apb_slave_interface_tb.tip
+Created probe 1
+ncsim> run
+WRITE : ADDR = 0 DATA = 51 TIME = 260
+WRITE : ADDR = 5 DATA = ff TIME = 460
+WRITE : ADDR = 1 DATA = 1 TIME = 1060
+WRITE : ADDR = 2 DATA = 1 TIME = 1260
+WRITE : ADDR = 5 DATA = ff TIME = 1460
+READ  : ADDR = 0 DATA = 0 TIME = 1660
+READ  : ADDR = 1 DATA = 1 TIME = 1860
+READ  : ADDR = 2 DATA = 1 TIME = 2060
+Simulation complete via $finish(1) at time 2110 NS + 0
+./spb_master_slave_interface_tb.v:205     $finish;
+ncsim> ^C
+ncsim> exit
+ncsim: Memory Usage - 20.7M program + 32.0M data = 52.7M total
+ncsim: CPU Usage - 2.2s system + 7.8s user = 10.0s total (151.6s, 6.6% cpu)

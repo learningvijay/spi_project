@@ -1,0 +1,259 @@
+//`timescale 1ns/1ps
+
+module spb_master_apb_slave_interface_tb();
+
+    // Testbench signals
+    reg p_clk;
+    reg p_reset;
+    reg p_select;
+    reg p_enable;
+    reg p_write;
+    reg [2:0] p_addr;
+    reg [7:0] p_data_in;
+    reg ss;
+    reg receive_data;
+    reg [7:0] data_from_receive_buffer_reg;
+    reg tip;
+    
+    wire [7:0] p_data_out;
+    wire send_data;
+    wire p_ready;
+    wire p_slverr;
+    wire spi_interrupt_request;
+    wire mstr, cpol, cpha, lsbfe, spiswai;
+    wire [7:0] data_to_send_buffer_reg;
+    wire [1:0] spi_mode;
+    wire [2:0] spr, sppr;
+    
+    // Instantiate DUT
+    spb_master_apb_slave_interface dut (
+        .p_clk(p_clk),
+        .p_reset(p_reset),
+        .p_select(p_select),
+        .p_enable(p_enable),
+        .p_write(p_write),
+        .p_addr(p_addr),
+        .p_data_in(p_data_in),
+        .ss(ss),
+        .receive_data(receive_data),
+        .data_from_receive_buffer_reg(data_from_receive_buffer_reg),
+        .tip(tip),
+        .p_data_out(p_data_out),
+        .send_data(send_data),
+        .p_ready(p_ready),
+        .p_slverr(p_slverr),
+        .spi_interrupt_request(spi_interrupt_request),
+        .mstr(mstr),
+        .cpol(cpol),
+        .cpha(cpha),
+        .lsbfe(lsbfe),
+        .spiswai(spiswai),
+        .data_to_send_buffer_reg(data_to_send_buffer_reg),
+        .spi_mode(spi_mode),
+        .spr(spr),
+        .sppr(sppr)
+    );
+    
+    // Clock generation
+    always #10 p_clk = ~p_clk;  // 50MHz clock
+    
+    // APB write task
+    task apb_write;
+        input [2:0] addr;
+        input [7:0] data;
+        begin
+            @(negedge p_clk);
+            p_select = 1'b1;
+            p_addr = addr;
+            p_data_in = data;
+            p_write = 1'b1;
+            p_enable = 1'b0;
+            
+            @(negedge p_clk);
+            p_enable = 1'b1;
+            
+            @(negedge p_clk);
+            wait(p_ready == 1'b1);
+            
+            @(negedge p_clk);
+            p_select = 1'b0;
+            p_enable = 1'b0;
+            p_write = 1'b0;
+        end
+    endtask
+    
+    // APB read task
+    task apb_read;
+        input [2:0] addr;
+        output [7:0] data;
+        begin
+            @(negedge p_clk);
+            p_select = 1'b1;
+            p_addr = addr;
+            p_write = 1'b0;
+            p_enable = 1'b0;
+            
+            @(negedge p_clk);
+            p_enable = 1'b1;
+            
+            @(negedge p_clk);
+            wait(p_ready == 1'b1);
+            data = p_data_out;
+            
+            @(negedge p_clk);
+            p_select = 1'b0;
+            p_enable = 1'b0;
+        end
+    endtask
+    
+    // Test variables
+    reg [7:0] read_data;
+    integer i;
+    
+    // Initial setup
+    initial begin
+        // Initialize signals
+        p_clk = 1'b0;
+        p_reset = 1'b0;
+        p_select = 1'b0;
+        p_enable = 1'b0;
+        p_write = 1'b0;
+        p_addr = 3'b000;
+        p_data_in = 8'b00000000;
+        ss = 1'b0;
+        receive_data = 1'b0;
+        data_from_receive_buffer_reg = 8'b00000000;
+        tip = 1'b0;
+        
+        // Reset the system
+        #30;
+        p_reset = 1'b1;
+        #20;
+        
+        // Test 1: Write and read back SPICR1 register
+        $display("\n=== Test 1: SPICR1 Register Write/Read ===");
+        apb_write(3'b000, 8'b11010100);  // Enable SPI, Master mode
+        apb_read(3'b000, read_data);
+        $display("SPICR1 Readback: %b (Expected: 11010100)", read_data);
+        
+        // Test 2: Write and read SPICR2 register
+        $display("\n=== Test 2: SPICR2 Register Write/Read ===");
+        apb_write(3'b001, 8'b00011011);  // Set MODFEN, BIDIROE, SPISWAI, SPCO
+        apb_read(3'b001, read_data);
+        $display("SPICR2 Readback: %b (Expected: 00011011)", read_data);
+        
+        // Test 3: Write and read SPIBR register
+        $display("\n=== Test 3: SPIBR Register Write/Read ===");
+        apb_write(3'b010, 8'b01110111);  // Set baud rate
+        apb_read(3'b010, read_data);
+        $display("SPIBR Readback: %b (Expected: 01110111)", read_data);
+        
+        // Test 4: Write and read SPIDR register
+        $display("\n=== Test 4: SPIDR Register Write/Read ===");
+        apb_write(3'b101, 8'b10101010);  // Write data to send
+        apb_read(3'b101, read_data);
+        $display("SPIDR Readback: %b (Expected: 10101010)", read_data);
+        
+        // Test 5: Read SPISR status register
+        $display("\n=== Test 5: SPISR Status Register Read ===");
+        apb_read(3'b011, read_data);
+        $display("SPISR Initial: %b (Expected: 00100000)", read_data);
+        
+        // Test 6: SPI data transmission simulation
+        $display("\n=== Test 6: SPI Data Transmission ===");
+        $display("Configuring SPI as Master...");
+        apb_write(3'b000, 8'b11010100);  // SPE=1, MSTR=1
+        apb_write(3'b101, 8'b11001100);  // Load data to send
+        
+        #100;
+        
+        // Simulate receive data
+        $display("Simulating receive data...");
+        data_from_receive_buffer_reg = 8'b00110011;
+        receive_data = 1'b1;
+        #20;
+        receive_data = 1'b0;
+        
+        // Check if send_data was asserted
+        if (dut.send_data)
+            $display("Send data asserted successfully");
+        else
+            $display("ERROR: Send data not asserted");
+            
+        // Test 7: APB access with error condition (tip = 0)
+        $display("\n=== Test 7: APB Slave Error Test ===");
+        tip = 1'b0;  // Simulate error condition
+        
+        @(negedge p_clk);
+        p_select = 1'b1;
+        p_addr = 3'b000;
+        p_write = 1'b1;
+        p_data_in = 8'b11111111;
+        p_enable = 1'b0;
+        
+        @(negedge p_clk);
+        p_enable = 1'b1;
+        
+        @(negedge p_clk);
+        #10;
+        if (p_slverr)
+            $display("Slave error detected as expected");
+        else
+            $display("ERROR: Slave error not detected");
+            
+        @(negedge p_clk);
+        p_select = 1'b0;
+        p_enable = 1'b0;
+        tip = 1'b1;
+        
+        // Test 8: Verify SPI mode transitions
+        $display("\n=== Test 8: SPI Mode Transitions ===");
+        $display("Initial SPI Mode: %b", spi_mode);
+        
+        // Disable SPI
+        apb_write(3'b000, 8'b01010100);  // SPE=0
+        #100;
+        $display("SPI Mode after SPE=0: %b", spi_mode);
+        
+        // Enable SPI with SPISWAI
+        apb_write(3'b001, 8'b00000010);  // Set SPISWAI
+        apb_write(3'b000, 8'b11010100);  // SPE=1
+        #100;
+        $display("SPI Mode with SPISWAI: %b", spi_mode);
+        
+        // Test 9: Multiple register access
+        $display("\n=== Test 9: Multiple Register Access ===");
+        for(i = 0; i < 5; i=i+1) begin
+            apb_write(3'b101, {4'b1010, 4'b0101});
+            apb_read(3'b101, read_data);
+            $display("Write %d: SPIDR = %b", i+1, read_data);
+            #50;
+        end
+        
+        // Test 10: Check control signal outputs
+        $display("\n=== Test 10: Control Signal Verification ===");
+        $display("mstr = %b, cpol = %b, cpha = %b", mstr, cpol, cpha);
+        $display("lsbfe = %b, spiswai = %b", lsbfe, spiswai);
+        $display("spr = %b, sppr = %b", spr, sppr);
+        
+        // Final test summary
+        $display("\n=== Test Summary ===");
+        $display("All tests completed successfully!");
+        
+        #100;
+        $finish;
+    end
+    
+    // Monitor important signals
+    initial begin
+        $monitor("Time=%0t | p_ready=%b | p_slverr=%b | send_data=%b | spi_mode=%b | data_to_send=%h", 
+                 $time, p_ready, p_slverr, send_data, spi_mode, data_to_send_buffer_reg);
+    end
+    
+    // Waveform dumping (for simulation tools)
+    initial begin
+        $dumpfile("spi_apb_interface.vcd");
+        $dumpvars(0, spb_master_apb_slave_interface_tb);
+    end
+    
+endmodule

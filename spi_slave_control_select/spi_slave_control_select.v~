@@ -3,8 +3,8 @@ module spi_slave_control_select (
     input [12:0]baudrate_divisor,
     input [1:0]spi_mode,
     output reg recive_data,
-    output reg ss,
-    output wire tip
+    output wire ss,
+    output tip
 );
  reg [15:0]count;
  wire[15:0]required_count_to_send;

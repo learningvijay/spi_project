@@ -1,4 +1,5 @@
-module spb_master_apb_slave_interface(
+`timescale 1ns/1ps
+module spi_master_apb_slave_interface(
     input p_clk,p_reset,p_select,p_enable,p_write,
     input [2:0] p_addr,
     input [7:0] p_data_in,
@@ -82,17 +83,22 @@ always @(posedge p_clk or negedge p_reset) begin
      end
             
    
-    else if ((receive_data)&&(present_mode==spi_run)||(present_mode==spi_wait)) begin
+    else if ((receive_data)&&((present_mode==spi_run)||(present_mode==spi_wait))) begin
         spidr<=data_from_receive_buffer_reg;
         send_data<=1'b0;
     end
-    else if ((spidr==p_data_in)&&(present_mode==spi_run)||(present_mode==spi_wait)) begin
-        send_data<=1'b1;
+    else if ((spidr==p_data_in)&&((present_mode==spi_run)||(present_mode==spi_wait))) begin
+         send_data<=1'b1;
         data_to_send_buffer_reg<=spidr;
         spidr<=8'b00000000;
-    end
+      end
+ else
+ begin
+ send_data<=1'b0;
+   end 
+
 end    
-//(spidr !=data_to_send_buffer_reg)&&
+//spidr !=data_to_send_buffer_reg
 //read access
 always@(*) begin
     if (read_en) begin

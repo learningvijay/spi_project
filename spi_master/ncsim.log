@@ -1,0 +1,21 @@
+ncsim: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+
+-------------------------------------
+Relinquished control to SimVision...
+ncsim> 
+ncsim> database -open waves -into waves.shm -default
+Created default SHM database waves
+ncsim> probe -create -shm spi_top_tb.data_from_receive_buffer_reg spi_top_tb.miso spi_top_tb.mosi spi_top_tb.p_addr spi_top_tb.p_clk spi_top_tb.p_data_in spi_top_tb.p_data_out spi_top_tb.p_enable spi_top_tb.p_ready spi_top_tb.p_reset spi_top_tb.p_select spi_top_tb.p_slverr spi_top_tb.p_write spi_top_tb.receive_buffer_reg spi_top_tb.receive_data spi_top_tb.s_clk spi_top_tb.send_data spi_top_tb.spi_interrupt_request spi_top_tb.spidr spi_top_tb.ss
+Created probe 1
+ncsim> run
+WRITE : ADDR = 0 DATA = 50 TIME = 580000
+WRITE : ADDR = 1 DATA = 0 TIME = 700000
+WRITE : ADDR = 2 DATA = 11 TIME = 820000
+WRITE : ADDR = 5 DATA = a5 TIME = 940000
+READ : ADDR = 5 DATA = 0 TIME = 3941000
+Simulation complete via $finish(1) at time 4441 NS + 0
+./spi_top_tb.v:320     $finish;
+ncsim> ^C
+ncsim> exit
+ncsim: Memory Usage - 20.7M program + 32.1M data = 52.7M total
+ncsim: CPU Usage - 29.6s system + 49.7s user = 79.3s total (1394.7s, 5.7% cpu)
