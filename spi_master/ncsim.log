@@ -15,7 +15,4 @@ WRITE : ADDR = 5 DATA = a5 TIME = 940000
 READ : ADDR = 5 DATA = 0 TIME = 3941000
 Simulation complete via $finish(1) at time 4441 NS + 0
 ./spi_top_tb.v:320     $finish;
-ncsim> ^C
-ncsim> exit
-ncsim: Memory Usage - 20.7M program + 32.1M data = 52.7M total
-ncsim: CPU Usage - 29.6s system + 49.7s user = 79.3s total (1394.7s, 5.7% cpu)
+ncsim> 

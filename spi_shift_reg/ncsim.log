@@ -18,5 +18,4 @@ vitual_slave_send_buffer = 12
 FORMAT=4 EXPECTED=12 RECEIVED=12
 Simulation complete via $finish(1) at time 21770 NS + 0
 ./spi_shift_reg_tb.v:372   #10  $finish;
-ncsim> ncsim: Memory Usage - 20.7M program + 35.8M data = 56.5M total
-ncsim: CPU Usage - 2.4s system + 11.7s user = 14.1s total (219.8s, 6.4% cpu)
+ncsim> 

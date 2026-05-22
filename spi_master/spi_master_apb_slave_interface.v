@@ -95,7 +95,7 @@ always @(posedge p_clk or negedge p_reset) begin
  else
  begin
  send_data<=1'b0;
-   end 
+  end 
 
 end    
 //spidr !=data_to_send_buffer_reg
@@ -208,7 +208,9 @@ end
 assign spi_mode = present_mode;
 assign read_en=((PRESENT_STATE==ACCESS)&&!p_write);
 assign write_en=((PRESENT_STATE==ACCESS)&& p_write);
+
 assign p_slverr=(PRESENT_STATE==ACCESS)?!tip:1'b0;
+
 assign p_ready=(PRESENT_STATE==ACCESS)?1'b1:1'b0;
 
 assign spi_interrupt_request = spie & (spisr[7] | spisr[6] | spisr[5]);

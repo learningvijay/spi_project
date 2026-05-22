@@ -1,3 +1,6 @@
 ncelab: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
-ncelab: Memory Usage - 26.2M program + 14.1M data = 40.3M total
-ncelab: CPU Usage - 0.2s system + 0.3s user = 0.6s total (0.5s, 100.0% cpu)
+spb_master_apb_slave_interface dut (
+                                 |
+ncelab: *E,CUVMUR (./spb_master_slave_interface_tb.v,43|33): instance 'spb_master_apb_slave_interface_tb.dut' of design unit 'spb_master_apb_slave_interface' is unresolved in 'worklib.spb_master_apb_slave_interface_tb:module'.
+ncelab: Memory Usage - 26.2M program + 14.5M data = 40.7M total
+ncelab: CPU Usage - 0.0s system + 0.0s user = 0.1s total (0.0s, 100.0% cpu)

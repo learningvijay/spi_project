@@ -1,0 +1,25 @@
+ncsim: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
+
+-------------------------------------
+Relinquished control to SimVision...
+ncsim> 
+ncsim> database -open waves -into waves.shm -default
+Created default SHM database waves
+ncsim> probe -create -shm tb_spi_slave_control_select.baudrate_divisor tb_spi_slave_control_select.mstr tb_spi_slave_control_select.p_clk tb_spi_slave_control_select.p_reset tb_spi_slave_control_select.recive_data tb_spi_slave_control_select.send_data tb_spi_slave_control_select.spi_mode tb_spi_slave_control_select.spiswai tb_spi_slave_control_select.ss tb_spi_slave_control_select.tip
+Created probe 1
+ncsim> run
+TIME=0 RESET=0 SEND=0 SS=1 TIP=0 COUNT_RECIVE=0
+TIME=20000 RESET=1 SEND=0 SS=1 TIP=0 COUNT_RECIVE=0
+TIME=40000 RESET=1 SEND=1 SS=1 TIP=0 COUNT_RECIVE=0
+TIME=45000 RESET=1 SEND=1 SS=0 TIP=1 COUNT_RECIVE=0
+TIME=50000 RESET=1 SEND=0 SS=0 TIP=1 COUNT_RECIVE=0
+TIME=225000 RESET=1 SEND=0 SS=1 TIP=0 COUNT_RECIVE=1
+TIME=235000 RESET=1 SEND=0 SS=1 TIP=0 COUNT_RECIVE=0
+TIME=350000 RESET=1 SEND=1 SS=1 TIP=0 COUNT_RECIVE=0
+TIME=355000 RESET=1 SEND=1 SS=0 TIP=1 COUNT_RECIVE=0
+TIME=360000 RESET=1 SEND=0 SS=0 TIP=1 COUNT_RECIVE=0
+TIME=535000 RESET=1 SEND=0 SS=1 TIP=0 COUNT_RECIVE=1
+TIME=545000 RESET=1 SEND=0 SS=1 TIP=0 COUNT_RECIVE=0
+Simulation complete via $finish(1) at time 660 NS + 0
+./spi_slave_control_tb.v:75         $finish;
+ncsim> 

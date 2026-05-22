@@ -192,7 +192,7 @@ begin
        repeat(10) @(posedge p_clk);
        data_from_receive_buffer_reg=8'b01011011;
        receive_data=1'b1;
-    apb_write(3'b001, 8'b00001001);
+    apb_write(3'b001, 8'h00001001);
     apb_write(3'b010, 8'b00000001);
      apb_write(3'b101, 8'hFF);
 

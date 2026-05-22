@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module spi_slave_control_select (
     input p_clk,p_reset,mstr,spiswai,send_data,
     input [12:0]baudrate_divisor,

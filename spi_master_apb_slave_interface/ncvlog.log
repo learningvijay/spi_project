@@ -1,6 +1,3 @@
 ncvlog: 10.20-s100: (c) Copyright 1995-2011 Cadence Design Systems, Inc.
-    apb_write(3'b001, 8'h00001001);
-                                |
-ncvlog: *W,INTOVF (/mnt/hgfs/apb_interface_spi_master_project/spi_master_apb_slave_interface/spb_master_slave_interface_tb.v,195|32): bit overflow during conversion from text [2.5(IEEE)] (8 bits).
 ncvlog: Memory Usage - 10.6M program + 8.4M data = 19.0M total
 ncvlog: CPU Usage - 0.0s system + 0.0s user = 0.0s total (0.0s, 100.0% cpu)

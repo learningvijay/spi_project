@@ -14,22 +14,19 @@ PASS : SPPR=0 SPR=1 DIV=4
 PASS : SPPR=3 SPR=7 DIV=1024
 PASS : SPPR=5 SPR=3 DIV=96
 PASS : SPPR=6 SPR=2 DIV=56
-PASS : SPPR=7 SPR=7 DIV=2048
- input TIME=50000 p_reset=0 spiswai=0 cpol=0 cpha=1 ss=0 spi_mode=00 sppr=111 spr=111
- output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=2048
- input TIME=50000 p_reset=1 spiswai=0 cpol=0 cpha=1 ss=1 spi_mode=00 sppr=111 spr=111
- output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=2048
- input TIME=50000 p_reset=0 spiswai=0 cpol=0 cpha=0 ss=0 spi_mode=00 sppr=111 spr=111
- output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=2048
- input TIME=501050000 p_reset=0 spiswai=0 cpol=1 cpha=1 ss=0 spi_mode=00 sppr=111 spr=111
- output TIME=501050000 | s_clk=0 | RX_R=0 | RX_F=0 | TX_R=0 | TX_F=0 | DIV=2048
- input TIME=1002050000 p_reset=0 spiswai=0 cpol=0 cpha=1 ss=0 spi_mode=00 sppr=111 spr=111
- output TIME=1002050000 | s_clk=1 | RX_R=0 | RX_F=0 | TX_R=0 | TX_F=0 | DIV=2048
- input TIME=1503050000 p_reset=0 spiswai=0 cpol=1 cpha=0 ss=0 spi_mode=00 sppr=111 spr=111
- output TIME=1503050000 | s_clk=0 | RX_R=0 | RX_F=0 | TX_R=0 | TX_F=0 | DIV=2048
+PASS : SPPR=0 SPR=1 DIV=4
+ input TIME=50000 p_reset=0 spiswai=0 cpol=0 cpha=1 ss=0 spi_mode=00 sppr=000 spr=001
+ output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=4
+ input TIME=50000 p_reset=1 spiswai=0 cpol=0 cpha=1 ss=1 spi_mode=00 sppr=000 spr=001
+ output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=4
+ input TIME=50000 p_reset=0 spiswai=0 cpol=0 cpha=0 ss=0 spi_mode=00 sppr=000 spr=001
+ output TIME=50000 | s_clk=0 | RX_R=x | RX_F=x | TX_R=x | TX_F=x | DIV=4
+ input TIME=501050000 p_reset=0 spiswai=0 cpol=1 cpha=1 ss=0 spi_mode=00 sppr=000 spr=001
+ output TIME=501050000 | s_clk=0 | RX_R=0 | RX_F=0 | TX_R=0 | TX_F=0 | DIV=4
+ input TIME=1002050000 p_reset=0 spiswai=0 cpol=0 cpha=1 ss=0 spi_mode=00 sppr=000 spr=001
+ output TIME=1002050000 | s_clk=1 | RX_R=1 | RX_F=0 | TX_R=0 | TX_F=0 | DIV=4
+ input TIME=1503050000 p_reset=0 spiswai=0 cpol=1 cpha=0 ss=0 spi_mode=00 sppr=000 spr=001
+ output TIME=1503050000 | s_clk=0 | RX_R=0 | RX_F=1 | TX_R=0 | TX_F=0 | DIV=4
 Simulation complete via $finish(1) at time 2004150 NS + 0
-./spi_baud_rate_generator_tb.v:179   #100$finish;
-ncsim> ^C
-ncsim> exit
-ncsim: Memory Usage - 20.7M program + 32.0M data = 52.7M total
-ncsim: CPU Usage - 1004.6s system + 1016.8s user = 2021.4s total (119045.1s, 1.7% cpu)
+./spi_baud_rate_generator_tb.v:181   #100$finish;
+ncsim> 

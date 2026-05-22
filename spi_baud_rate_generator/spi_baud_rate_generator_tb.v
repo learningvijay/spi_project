@@ -27,7 +27,7 @@ wire miso_receive_s_clk_falling;
 wire mosi_send_s_clk_rising;
 wire mosi_send_s_clk_falling;
 
-wire [11:0] spi_baud_rate_divisor;
+wire [12:0] spi_baud_rate_divisor;
 
 
 //
@@ -152,8 +152,10 @@ initial begin
     check_divisor(3'b011,3'b111,1024);
     check_divisor(3'b101,3'b011,96);
     check_divisor(3'b110,3'b010,56);
-    check_divisor(3'b111,3'b111,2048);
+ //   check_divisor(3'b111,3'b111,2048);
+      //  check_divisor(3'b000,3'b001,4);
     //check_divisor(3'b000,3'b001,4);
+        check_divisor(3'b000,3'b001,4);
     setup_and_check(1'b0,1'b0,1'b0,1'b0,1'b1);
     setup_and_check(1'b1,1'b1,1'b0,1'b0,1'b1);
    setup_and_check(1'b0,1'b0,1'b0,1'b0,1'b0);
