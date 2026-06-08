@@ -1,0 +1,377 @@
+`timescale 1ns/1ps
+
+module tb_spi_shift_reg;
+
+//
+// INPUTS
+//
+reg p_clk;
+reg p_reset;
+reg ss;
+reg lsbef;
+reg cpha;
+reg cpol;
+
+reg send_data;
+reg receive_data;
+
+reg miso_receive_s_clk_rising;
+reg miso_receive_s_clk_falling;
+
+reg mosi_send_s_clk_rising;
+reg mosi_send_s_clk_falling;
+
+reg [7:0] data_from_spidr;
+
+reg miso;
+
+//
+// OUTPUTS
+//
+wire mosi;
+
+wire [7:0] data_to_spidr;
+reg [7:0]receive_buffer_reg;
+reg [7:0]send_buffer_reg; 
+ reg [2:0]count1;
+  reg [2:0]count0;
+   reg [2:0]count2;
+    reg [2:0]count3;
+//
+// DUT INSTANTIATION
+//
+spi_shift_reg DUT (
+    .p_clk(p_clk),
+    .p_reset(p_reset),
+    .ss(ss),
+    .lsbef(lsbef),
+    .cpha(cpha),
+    .cpol(cpol),
+
+    .send_data(send_data),
+    .receive_data(receive_data),
+
+    .miso_receive_s_clk_rising(miso_receive_s_clk_rising),
+    .miso_receive_s_clk_falling(miso_receive_s_clk_falling),
+
+    .mosi_send_s_clk_rising(mosi_send_s_clk_rising),
+    .mosi_send_s_clk_falling(mosi_send_s_clk_falling),
+
+    .data_from_spidr(data_from_spidr),
+
+    .miso(miso),
+
+    .mosi(mosi),
+
+    .data_to_spidr(data_to_spidr)
+);
+initial p_clk=1'b0;
+always #20 p_clk=~p_clk;
+
+always@(*)
+begin
+receive_buffer_reg=DUT.receive_buffer_reg;
+send_buffer_reg=DUT.send_buffer_reg; 
+  count0=DUT.count0;
+  count1=DUT.count1;
+  count2=DUT.count2;
+  count3=DUT.count3;
+end
+
+
+task initialize;
+begin
+    p_reset  = 1'b0;
+    ss       = 1'b1;
+    lsbef    = 1'b0;
+    cpha     = 1'b0;
+    cpol     = 1'b0;
+
+    send_data    = 1'b0;
+    receive_data = 1'b0;
+
+    miso_receive_s_clk_rising  = 1'b0;
+    miso_receive_s_clk_falling = 1'b0;
+
+    mosi_send_s_clk_rising  = 1'b0;
+    mosi_send_s_clk_falling = 1'b0;
+
+    data_from_spidr = 8'h00;
+
+    miso = 1'b0;
+end
+endtask
+
+task shift_s_en;
+begin
+  p_reset  = 1'b1;
+    ss       = 1'b0;
+end
+endtask
+
+task shift_format(input a,b,c,d,e);
+begin
+  lsbef    = a;
+    cpha     = b;
+    cpol     = c;
+     send_data    = d;
+    receive_data = e;
+end
+endtask
+
+integer i;
+integer ai,j;
+reg [7:0] vitual_slave_send_buffer;
+
+initial begin
+initialize;
+#10;
+shift_s_en;
+    //-----------------------------------------
+    // TEST ALL SEND LOGIC FORMATS
+    //-----------------------------------------
+
+    for(i=0; i<4; i=i+1)
+    begin
+
+        //-----------------------------------------
+        // MODE SELECTION
+        //-----------------------------------------
+
+        case(i)
+
+            // MSB + RISING
+            0: begin
+            @(posedge p_clk);
+                shift_format(0,0,0,1,0);
+            end
+
+            // LSB + RISING
+            1: begin
+            @(posedge p_clk);
+                shift_format(1,0,0,1,0);
+            end
+
+            // MSB + FALLING
+            2: begin
+            @(posedge p_clk);
+                shift_format(0,1,0,1,0);
+            end
+
+            // LSB + FALLING
+            3: begin
+            @(posedge p_clk);
+                shift_format(1,1,0,1,0);
+            end
+
+        endcase
+
+
+        //-----------------------------------------
+        // RANDOM DATA LOAD
+        //-----------------------------------------
+        @(posedge p_clk);
+        data_from_spidr = $random & 8'hFF;
+
+       @(posedge p_clk);
+         
+        shift_format(lsbef,cpha,cpol,0,0);
+
+
+        //-----------------------------------------
+        // SHIFT GENERATION
+        //-----------------------------------------
+
+        repeat(8)
+        begin
+
+            repeat(7)
+                @(posedge p_clk);
+
+            //-----------------------------------------
+            // RISING EDGE CASES
+            //-----------------------------------------
+
+            if(cpha == cpol)
+            begin
+
+                mosi_send_s_clk_rising = 1'b1;
+
+                @(posedge p_clk);
+
+                mosi_send_s_clk_rising = 1'b0;
+
+            end
+
+            //-----------------------------------------
+            // FALLING EDGE CASES
+            //-----------------------------------------
+
+            else
+            begin
+
+                mosi_send_s_clk_falling = 1'b1;
+
+                @(posedge p_clk);
+
+                mosi_send_s_clk_falling = 1'b0;
+
+            end
+
+            #10;
+
+        end
+
+        #100;
+
+    end
+    
+
+
+    //-----------------------------------------
+    // TEST ALL RECEIVE FORMATS
+    //-----------------------------------------
+
+    for(ai=0; ai<4; ai=ai+1)
+    begin
+
+        //-----------------------------------------
+        // FORMAT SELECTION
+        //-----------------------------------------
+
+        case(ai)
+
+            // MSB + RISING
+            0: begin
+                shift_format(0,0,0,0,0);
+            end
+
+            // LSB + RISING
+            1: begin
+                shift_format(1,0,0,0,0);
+            end
+
+            // MSB + FALLING
+            2: begin
+                shift_format(0,1,0,0,0);
+            end
+
+            // LSB + FALLING
+            3: begin
+                shift_format(1,1,0,0,0);
+            end
+
+        endcase
+
+
+        //-----------------------------------------
+        // RANDOM RECEIVE DATA
+        //-----------------------------------------
+
+        vitual_slave_send_buffer = $random & 8'hFF;
+
+        $display("vitual_slave_send_buffer = %h", vitual_slave_send_buffer);
+
+
+        //-----------------------------------------
+        // SHIFT RECEIVE DATA
+        //-----------------------------------------
+
+        for(j=0; j<8; j=j+1)
+        begin
+
+            //-----------------------------------------
+            // MSB FIRST
+            //-----------------------------------------
+
+            if(lsbef == 1'b0)
+                miso = vitual_slave_send_buffer[7-j];
+
+            //-----------------------------------------
+            // LSB FIRST
+            //-----------------------------------------
+
+            else
+                miso = vitual_slave_send_buffer[j];
+
+
+            //-----------------------------------------
+            // RISING EDGE RECEIVE
+            //-----------------------------------------
+
+            if(cpha == cpol)
+            begin
+
+                @(posedge p_clk);
+                miso_receive_s_clk_rising = 1'b1;
+
+              
+                   @(posedge p_clk);
+                miso_receive_s_clk_rising = 1'b0;
+                  @(posedge p_clk);
+                 @(posedge p_clk);
+                  @(posedge p_clk);
+                    @(posedge p_clk);
+                 @(posedge p_clk);
+                  @(posedge p_clk);
+
+            end
+
+            //-----------------------------------------
+            // FALLING EDGE RECEIVE
+            //-----------------------------------------
+
+            else
+            begin
+
+                @(posedge p_clk);
+                
+                miso_receive_s_clk_falling = 1'b1;
+
+                
+                   @(posedge p_clk);
+                miso_receive_s_clk_falling = 1'b0;
+                @(posedge p_clk);
+                 @(posedge p_clk);
+                  @(posedge p_clk);
+                  @(posedge p_clk);
+                 @(posedge p_clk);
+                  @(posedge p_clk);
+
+            end
+
+        end
+
+
+        //-----------------------------------------
+        // MOVE RECEIVE BUFFER TO SPIDR
+        //-----------------------------------------
+
+        receive_data = 1'b1;
+
+        @(posedge p_clk);
+
+        receive_data = 1'b0;
+
+
+        //-----------------------------------------
+        // RESULT CHECK
+        //-----------------------------------------
+
+        $display(
+            "FORMAT=%0d EXPECTED=%h RECEIVED=%h",
+            i,
+            vitual_slave_send_buffer,
+            data_to_spidr
+        );
+
+        #100;
+
+    end
+
+  #10  $finish;
+
+
+
+end
+endmodule
